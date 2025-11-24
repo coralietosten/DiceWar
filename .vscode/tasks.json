@@ -1,0 +1,16 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake: Build Debug",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build", "${workspaceFolder}/out/build/linux-debug"
+            ],
+            "problemMatcher": [],
+            "group": "build",
+            "detail": "Build project using CMake linux-debug preset"
+        }
+    ]
+}

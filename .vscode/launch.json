@@ -1,0 +1,67 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "dicewars/debug strategy againt strategydummy",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/Linux/Debug/dicewars",
+      "args": ["-r","./bin/Linux/Debug/referee.so","-m","./bin/Linux/Debug/genmap.so","-s","./bin/Linux/Debug/strategy.so","-s","./bin/Linux/Debug/strategydummy.so","-g","./bin/Linux/Debug/guistats.so"],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "CMake: Build Debug",
+      "miDebuggerPath": "/usr/bin/gdb"
+    },
+    {
+      "name": "maptester/debug on genmap with printmap",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/Linux/Debug/maptester",
+      "args": ["-m","./bin/Linux/Debug/genmap.so","-p"],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "CMake: Build Debug",
+      "miDebuggerPath": "/usr/bin/gdb"
+    },
+    {
+      "name": "libinfo",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/Linux/Debug/libinfo",
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/bin/Linux/Debug/",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "CMake: Build Debug",
+      "miDebuggerPath": "/usr/bin/gdb"
+    }
+  ]
+}

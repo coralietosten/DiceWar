@@ -1,0 +1,17 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "type": "launch",
+      "taskLabel": "Build Debug Preset",
+      "appliesTo": "/",
+      "contextType": "build",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "${workspaceRoot}/out/build/x64-debug"
+      ],
+      "launchOption": "None"
+    }
+  ]
+}
