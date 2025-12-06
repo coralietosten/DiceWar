@@ -1,1 +1,0 @@
-/usr/bin/c++ -g -Wl,--export-dynamic -rdynamic CMakeFiles/libinfo.dir/src/main.cpp.o -o /home/ETUDIANT/e24a068f/coralie/coralie/Coralie.Tosten.E24A068F/S7/c++/projet/mini-projet-cpp/bin/Linux/Debug/libinfo  -ldl 
