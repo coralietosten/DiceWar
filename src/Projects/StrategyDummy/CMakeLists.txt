@@ -7,7 +7,7 @@ enable_hot_reload()
 project(${LIB_NAME} VERSION 1.0.0 LANGUAGES C CXX)
 
 add_library(${LIB_NAME} MODULE
- "src/Strategy.cpp"
+ "src/strategy.cpp"
  "src/Strategy.h"
  "src/StrategyDummy.cpp"
  "src/StrategyDummy.h"
