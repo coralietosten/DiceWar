@@ -13,4 +13,4 @@
 
 #include "MapLoader.h"
 
-void LoadRandomMap(Regions& regions);
+void LoadRandomMap(Regions& regions, unsigned int r = 28, unsigned int c = 32);

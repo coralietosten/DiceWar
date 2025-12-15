@@ -199,14 +199,14 @@ void GenerateRandomMap(std::vector<RegionBuild>& regions, int r = 28, int c = 32
 
 using Regions2 = std::vector<RegionBuild>;
 
-void LoadRandomMap(Regions& regions)
+void LoadRandomMap(Regions& regions,unsigned int r,unsigned int c)
 {    
 	regions.clear();
 	srand(static_cast<unsigned>(std::time(nullptr)));
     Regions2 region2 = {};
-	GenerateRandomMap(region2);
+	GenerateRandomMap(region2,r,c);
     for (const auto& region : region2) {
-		std::cout << region.cells << std::endl;
+		//std::cout << region.cells << std::endl;
     	regions.push_back(region.cells.toUnsignedInt());
     }
 }

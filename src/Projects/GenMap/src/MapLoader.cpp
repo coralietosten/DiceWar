@@ -6,7 +6,7 @@ SRegions* MapLoader::GenerateMap(unsigned int& r, unsigned int& c)
 {
 	Regions regions;
 	//LoadDefaultMap(regions); //GENERATION PAR DEFAUT
-	LoadRandomMap(regions); //GENERATION ALEATOIRE
+	LoadRandomMap(regions,r,c); //GENERATION ALEATOIRE
 	unsigned int nbR, nbC;
 	SRegions* sregions = ConvertMap(regions, nbR, nbC);
 	r = nbR;
