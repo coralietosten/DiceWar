@@ -7,11 +7,14 @@ enable_hot_reload()
 project(${LIB_NAME} VERSION 1.0.0 LANGUAGES C CXX)
 
 add_library(${LIB_NAME} MODULE
- "src/StaticMapGenerator.cpp"
+ #"src/StaticMapGenerator.cpp"
+ "src/RandomMapGenerator.cpp"
  "src/MapLoader.cpp"
  "src/MapLoader.h"
- "src/DefaultMap.cpp"
- "src/DefaultMap.h"
+ #"src/DefaultMap.cpp"
+ #"src/DefaultMap.h"
+ "src/RandomMap.cpp"
+ "src/RandomMap.h"
  "src/interface_lib.h"
 )
 

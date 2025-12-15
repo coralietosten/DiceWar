@@ -1,10 +1,12 @@
 #include "MapLoader.h"
 #include "DefaultMap.h"
+#include "RandomMap.h"
 
 SRegions* MapLoader::GenerateMap(unsigned int& r, unsigned int& c)
 {
 	Regions regions;
-	LoadDefaultMap(regions);
+	//LoadDefaultMap(regions); //GENERATION PAR DEFAUT
+	LoadRandomMap(regions); //GENERATION ALEATOIRE
 	unsigned int nbR, nbC;
 	SRegions* sregions = ConvertMap(regions, nbR, nbC);
 	r = nbR;
