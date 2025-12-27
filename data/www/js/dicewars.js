@@ -6,13 +6,14 @@ function setAttributes(el, attrs) {
 	}
 }
 
-const WebSocketUrl = window.location.host + "/ws";
+const WebSocketUrl = "ws://localhost:8080";
+
 const ProtocolVersion = 1;
 
 var ws;
 function webSocketStart() {
 	try {
-		ws = new WebSocket("ws://" + WebSocketUrl);
+		ws = new WebSocket( WebSocketUrl);
 	} catch (exception) {
 		console.error(exception);
 	}
