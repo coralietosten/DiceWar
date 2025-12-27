@@ -10,6 +10,8 @@
 #include <iostream>
 #include <typeinfo>
 #include <map>
+#include <set>
+#include <unordered_map>
 
 #include "MapLoader.h"
 
