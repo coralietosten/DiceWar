@@ -142,5 +142,5 @@ struct ResultatChemin {
     double probabilite;
 };
 
-ResultatChemin CalculerMeilleurChemin(const SMap map, const SCell& start, const SCell& goal, const std::vector<SCell>& path = {});
+ResultatChemin AStar(const SMap map, const SCell& start, const SCell& goal, const std::vector<SCell>& path = {});
 ```
