@@ -170,7 +170,7 @@ class RegionBuild {
 const CellList RegionBuild::evenNeighbours({{-1, -1}, {-1, 0}, {0, -1}, {0, 1}, {1, -1}, {1, 0}});
 const CellList RegionBuild::oddNeighbours({{-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, 0}, {1, 1}});
 
-int GenerateRandomMap(std::vector<RegionBuild>& regions, int r = 28, int c = 32, int subdivisionFactor = 6, int offsetFactor = 3, float maxTerritorySize = 5,int iteration = 30,bool testPrint = false) {
+int GenerateRandomMap(std::vector<RegionBuild>& regions,int r = 28, int c = 32, int subdivisionFactor = 6, int offsetFactor = 3, float maxTerritorySize = 5,int iteration = 35,  int fillPercent = 100, bool testPrint = false) {
 
     //Les origines des territoires sont réparties uniformément sur la grille d'hexagone (avec un léger décalage aléatoire pour chaque centre afin de rendre le tout plus organique). Depuis ces origines, les territoires s'étendent un par un et s'arrête quand ils ne peuvent plus s'étendre (ils ne peuvent pas s'étendre sur un autre territoire et ont un rayon maximum d'expansion). Enfin, on supprime les territoires qui n'ont pas assez de cases et qui ne déconnectent pas le graphe. 
     //sizeX : largeur de la carte (32 sur le site dicewars)
@@ -189,16 +189,20 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions, int r = 28, int c = 32,
 
     for (int x = startx; x < c; x += ecartx) {
         for (int y = starty; y < r; y += ecarty) {
-            int randomOffsetx = (rand() % (1 + offsetFactor * 2)) - offsetFactor;
-            int randomOffsety = (rand() % (1 + offsetFactor * 2)) - offsetFactor;
-            int xvalue = x + randomOffsetx;
-            int yvalue = y + randomOffsety;
-            if(grid.getCell(xvalue,yvalue) != 0 || xvalue < 0 || xvalue >= c || yvalue < 0 || yvalue >= r) break;
-            territoryID += 1;
-            grid.setCell(xvalue,yvalue,territoryID);
-			RegionBuild region(r, c, maxTerritorySize, xvalue, yvalue, &grid);
-            region.id = territoryID;
-            regions.push_back(region);
+            int isPlacing = (rand() % 100);
+            if(isPlacing <= fillPercent) //si la probabilité de placer une région est bonne, continuer.
+            {
+                int randomOffsetx = (rand() % (1 + offsetFactor * 2)) - offsetFactor;
+                int randomOffsety = (rand() % (1 + offsetFactor * 2)) - offsetFactor;
+                int xvalue = x + randomOffsetx;
+                int yvalue = y + randomOffsety;
+                if(grid.getCell(xvalue,yvalue) != 0 || xvalue < 0 || xvalue >= c || yvalue < 0 || yvalue >= r) break;
+                territoryID += 1;
+                grid.setCell(xvalue,yvalue,territoryID);
+                RegionBuild region(r, c, maxTerritorySize, xvalue, yvalue, &grid);
+                region.id = territoryID;
+                regions.push_back(region);
+            }
         }
     }
 
@@ -335,7 +339,38 @@ void LoadRandomMap(Regions& regions,unsigned int r,unsigned int c)
     Regions2 region2 = {};
     //Il serait possible de calculer le facteur de subdivision, la taille max des territoires ainsi que le nombre d'itération en fonction
     //de la taille de la grille afin d'avoir un nombre de territoire homogène même avec une grille plus ou moins grande.
-	int rootMax = GenerateRandomMap(region2,r,c);
+
+    int mapSize = r*c;
+    int maximumGenerationTry = 1024;//pour ne pas que l'algo tourne indéfiniment, on définit un nombre d'essai maximum
+
+    //les trois valeurs suivantes ont étées choisies arbitrairement pour avoir une bonne forme de carte, elles sont toujours modifiable.
+    int minimumRegionNumber = 29;//on veut au minimum 16 régions
+    int maximumRegionNumber = 35;//on veut au maximum 35 régions
+    int iteration = mapSize/40;
+    int territorySize = mapSize/80;
+
+    int regionAmount = 0;
+    int rootMax = 0;
+    int tryNumber = 0;
+    
+    std::cout << "Generating a map with [map size : " << mapSize << " iteration : " << iteration << " territory size : " << territorySize << "]" << std::endl;
+
+    while(tryNumber < maximumGenerationTry && (regionAmount < minimumRegionNumber || regionAmount > maximumRegionNumber))
+    {
+        int fillPercent = 50 + maximumGenerationTry/(maximumGenerationTry-tryNumber + 1)/2; //on fait varier le pourcentage de remplissage de 50 à 100 en fonction des tests;
+        //std::cout << "try : " << tryNumber << std::endl;
+        regionAmount = 0;
+        region2 = {};
+
+        rootMax = GenerateRandomMap(region2,r,c,8,3,territorySize,iteration,fillPercent);
+    
+        for (auto& r : region2) {
+            if(r.Find()->id != rootMax) continue;
+            regionAmount ++;
+        }
+
+        tryNumber ++;
+    }
 
     for (auto& r : region2) {
         if(r.Find()->id != rootMax) continue;
