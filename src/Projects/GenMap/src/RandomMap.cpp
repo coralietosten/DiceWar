@@ -102,12 +102,12 @@ class RegionBuild {
         static const CellList evenNeighbours;
         static const CellList oddNeighbours;
         CellList cells;
-        CellList frontiere;
+        CellList border;
 
         RegionBuild(int _r, int _c, float _maxSize, int _x, int _y, Grid* _grid): r(_r), c(_c), maxSize(_maxSize), grid(_grid) {
             center = {_x, _y};
             addCell(center);
-            calculerFrontiere(center);
+            computeBorder(center);
             parent = nullptr;
         }
         
@@ -142,27 +142,27 @@ class RegionBuild {
             return std::sqrt(distx * distx + disty * disty);
         }
 
-        void aggrandirFrontiere() {
-            std::pair<int, int> newcell = frontiere.GetRandomCell();
+        void enlargeBorder() {
+            std::pair<int, int> newcell = border.GetRandomCell();
             if (grid->getCell(newcell.first,newcell.second) != 0) return;
             if (cells.contains(newcell)) return;
             if (newcell == std::pair<int, int>{-1, -1} || distance(newcell, center) > maxSize) return;
 
-            calculerFrontiere(newcell);
+            computeBorder(newcell);
             addCell(newcell);
         }
 
-        void calculerFrontiere(std::pair<int, int> cell) {
-            for (const auto& voisin : ((cell.first % 2 == 0) ? evenNeighbours : oddNeighbours)) {
-                int new_r = voisin.first + cell.first;
-                int new_c = voisin.second + cell.second;
+        void computeBorder(std::pair<int, int> cell) {
+            for (const auto& neighbour : ((cell.first % 2 == 0) ? evenNeighbours : oddNeighbours)) {
+                int new_r = neighbour.first + cell.first;
+                int new_c = neighbour.second + cell.second;
 
                 if (new_r >= 0 && new_c >= 0 && new_r < r && new_c < c) {
                     if (!cells.contains({new_r, new_c})) {
-                        frontiere.add({new_r, new_c});
+                        border.add({new_r, new_c});
                     }
                 }
-                frontiere.remove(cell);
+                border.remove(cell);
             }
         }
 };
@@ -205,7 +205,7 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions, int r = 28, int c = 32,
     for(int i = 0; i< iteration;i++)
     {
 		for (auto& region : regions) {
-			region.aggrandirFrontiere();
+			region.enlargeBorder();
 		}
     }
 
@@ -217,7 +217,7 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions, int r = 28, int c = 32,
         ///UNIR ET TROUVER///
         /////////////////////
         std::set<int> result;
-        for (const auto& c : r.frontiere.cells) {
+        for (const auto& c : r.border.cells) {
             int neighbourId = grid.getCell(c.first, c.second);
             if (neighbourId > 0 && neighbourId != r.id) {
                 result.insert(neighbourId);
@@ -240,7 +240,7 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions, int r = 28, int c = 32,
         ////////////////////////////
         if(testPrint)
         {
-            for (auto& c : r.frontiere.toUnsignedInt())
+            for (auto& c : r.border.toUnsignedInt())
             {
                 grid2.setCell(c.first,c.second*2 + (c.first % 2 == 0 ? 0 : 1),2);
             }
