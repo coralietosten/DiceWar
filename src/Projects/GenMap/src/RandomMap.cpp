@@ -10,6 +10,7 @@ class Grid {
         Grid(int rows,int cols) : nrow(rows), ncol(cols) {
             tab.resize(nrow, std::vector<int>(ncol, 0));
         }
+        ~Grid() = default;
 
         int getCell(int x, int y) {
             return (x >= 0 && x < nrow && y >= 0 && y < ncol) ? tab[x][y] : -1;
@@ -22,150 +23,152 @@ class Grid {
 };
 
 class CellList {
-public:
-    std::vector<std::pair< int,  int>> cells;
+    public:
+        std::vector<std::pair< int,  int>> cells;
 
-    CellList() = default;
-
-    CellList(std::initializer_list<std::pair< int,  int>> init) {
-        for (auto& cell : init) {
-            cells.push_back(cell);
-        }
-    }
-
-    void add(const std::pair<int, int>& cell) {
-        cells.push_back(cell);
-    }
-
-    void remove(const std::pair<int, int>& cell) {
-        cells.erase(std::remove(cells.begin(), cells.end(), cell), cells.end());
-    }
-
-    auto begin() { return cells.begin(); }
-    auto end() { return cells.end(); }
-
-    auto begin() const { return cells.begin(); }
-    auto end() const { return cells.end(); }
-
-    std::pair<int, int> GetRandomCell() {
-        if (cells.empty()) {
-            return std::pair<int, int>(-1, -1);
-        }
-        int randomIndex = rand() % cells.size();
-        std::pair<int, int> randomCell = cells[randomIndex];
-        cells.erase(cells.begin() + randomIndex);
-        return randomCell;
-    }
-
-    bool contains(const std::pair< int,  int>& cell) const {
-        for (const auto& c : cells) {
-            if (c == cell) {
-                return true;
+        CellList() = default;
+        ~CellList() = default;
+        CellList(std::initializer_list<std::pair< int,  int>> init) {
+            for (auto& cell : init) {
+                cells.push_back(cell);
             }
         }
-        return false; 
-    }
 
-	std::vector<std::pair<unsigned int, unsigned int>> toUnsignedInt() const {
-		std::vector<std::pair<unsigned int, unsigned int>> unsignedCells;
-		
-		for (const auto& cell : cells) {
-			unsignedCells.push_back({static_cast<unsigned int>(cell.first), static_cast<unsigned int>(cell.second)});
-		}
-		
-		return unsignedCells;
-	}
-
-
-    friend std::ostream& operator<<(std::ostream& os, const CellList& list) {
-        os << "[ ";
-        for (const auto& cell : list.cells) {
-            os << "(" << cell.first << ", " << cell.second << ") ";
+        void add(const std::pair<int, int>& cell) {
+            cells.push_back(cell);
         }
-        os << "]";
-        return os;
-    }
+
+        void remove(const std::pair<int, int>& cell) {
+            cells.erase(std::remove(cells.begin(), cells.end(), cell), cells.end());
+        }
+
+        auto begin() { return cells.begin(); }
+        auto end() { return cells.end(); }
+
+        auto begin() const { return cells.begin(); }
+        auto end() const { return cells.end(); }
+
+        std::pair<int, int> GetRandomCell() {
+            if (cells.empty()) {
+                return std::pair<int, int>(-1, -1);
+            }
+            int randomIndex = rand() % cells.size();
+            std::pair<int, int> randomCell = cells[randomIndex];
+            cells.erase(cells.begin() + randomIndex);
+            return randomCell;
+        }
+
+        bool contains(const std::pair< int,  int>& cell) const {
+            for (const auto& c : cells) {
+                if (c == cell) {
+                    return true;
+                }
+            }
+            return false; 
+        }
+
+        std::vector<std::pair<unsigned int, unsigned int>> toUnsignedInt() const {
+            std::vector<std::pair<unsigned int, unsigned int>> unsignedCells;
+            
+            for (const auto& cell : cells) {
+                unsignedCells.push_back({static_cast<unsigned int>(cell.first), static_cast<unsigned int>(cell.second)});
+            }
+            
+            return unsignedCells;
+        }
+
+
+        friend std::ostream& operator<<(std::ostream& os, const CellList& list) {
+            os << "[ ";
+            for (const auto& cell : list.cells) {
+                os << "(" << cell.first << ", " << cell.second << ") ";
+            }
+            os << "]";
+            return os;
+        }
 };
 
 class RegionBuild {
-private:
-    float maxSize;
-    std::pair<int, int> center;
+    private:
+        float maxSize;
+        std::pair<int, int> center;
 
-public:
-    int id;
-    Grid &grid;
-    RegionBuild* parent;
-    int r;
-    int c;
-    CellList evenNeighbours;
-    CellList oddNeighbours;
-    CellList cells;
-    CellList frontiere;
+    public:
+        int id;
+        Grid *grid;
+        RegionBuild* parent;
+        int r;
+        int c;
+        static const CellList evenNeighbours;
+        static const CellList oddNeighbours;
+        CellList cells;
+        CellList frontiere;
 
-    void setGridCell(int x, int y, int value) {
-        grid.setCell(x, y, value);
-    }
-
-    RegionBuild(int _r, int _c, float _maxSize, int _x, int _y, Grid& _grid)
-        : r(_r), c(_c), maxSize(_maxSize), grid(_grid) {
-        evenNeighbours = CellList({{-1, -1}, {-1, 0}, {0, -1}, {0, 1}, {1, -1}, {1, 0}});
-        oddNeighbours = CellList({{-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, 0}, {1, 1}});
-        center = {_x, _y};
-        addCell(center);
-        calculerFrontiere(center);
-        parent = nullptr;
-    }
-
-    RegionBuild* Find() {
-        if (parent == nullptr) return this;
-        parent = parent->Find();
-        return parent;
-    }
-
-    void Union(RegionBuild* region) {
-        RegionBuild* root1 = Find();
-        RegionBuild* root2 = region -> Find();
-        if (root1 != root2) {
-            root1->parent = root2;
+        RegionBuild(int _r, int _c, float _maxSize, int _x, int _y, Grid* _grid): r(_r), c(_c), maxSize(_maxSize), grid(_grid) {
+            center = {_x, _y};
+            addCell(center);
+            calculerFrontiere(center);
+            parent = nullptr;
         }
-    }
-    
-    void addCell(std::pair<int, int> cell) {
-        cells.add(cell);
-        setGridCell(cell.first,cell.second,id);
-    }
+        
+        ~RegionBuild() = default;
 
-    float distance(std::pair<int, int> cell1, std::pair<int, int> cell2) {
-        int distx = cell2.first - cell1.first;
-        int disty = cell2.second - cell1.second;
-        return std::sqrt(distx * distx + disty * disty);
-    }
+        void setGridCell(int x, int y, int value) {
+            grid->setCell(x, y, value);
+        }
 
-    void aggrandirFrontiere() {
-        std::pair<int, int> newcell = frontiere.GetRandomCell();
-        if (grid.getCell(newcell.first,newcell.second) != 0) return;
-        if (cells.contains(newcell)) return;
-        if (newcell == std::pair<int, int>{-1, -1} || distance(newcell, center) > maxSize) return;
+        RegionBuild* Find() {
+            if (parent == nullptr) return this;
+            parent = parent->Find();
+            return parent;
+        }
 
-        calculerFrontiere(newcell);
-        addCell(newcell);
-    }
-
-    void calculerFrontiere(std::pair<int, int> cell) {
-        for (const auto& voisin : ((cell.first % 2 == 0) ? evenNeighbours : oddNeighbours)) {
-            int new_r = voisin.first + cell.first;
-            int new_c = voisin.second + cell.second;
-
-            if (new_r >= 0 && new_c >= 0 && new_r < r && new_c < c) {
-                if (!cells.contains({new_r, new_c})) {
-                    frontiere.add({new_r, new_c});
-                }
+        void Union(RegionBuild* region) {
+            RegionBuild* root1 = Find();
+            RegionBuild* root2 = region -> Find();
+            if (root1 != root2) {
+                root1->parent = root2;
             }
-            frontiere.remove(cell);
         }
-    }
+        
+        void addCell(std::pair<int, int> cell) {
+            cells.add(cell);
+            setGridCell(cell.first,cell.second,id);
+        }
+
+        float distance(std::pair<int, int> cell1, std::pair<int, int> cell2) {
+            int distx = cell2.first - cell1.first;
+            int disty = cell2.second - cell1.second;
+            return std::sqrt(distx * distx + disty * disty);
+        }
+
+        void aggrandirFrontiere() {
+            std::pair<int, int> newcell = frontiere.GetRandomCell();
+            if (grid->getCell(newcell.first,newcell.second) != 0) return;
+            if (cells.contains(newcell)) return;
+            if (newcell == std::pair<int, int>{-1, -1} || distance(newcell, center) > maxSize) return;
+
+            calculerFrontiere(newcell);
+            addCell(newcell);
+        }
+
+        void calculerFrontiere(std::pair<int, int> cell) {
+            for (const auto& voisin : ((cell.first % 2 == 0) ? evenNeighbours : oddNeighbours)) {
+                int new_r = voisin.first + cell.first;
+                int new_c = voisin.second + cell.second;
+
+                if (new_r >= 0 && new_c >= 0 && new_r < r && new_c < c) {
+                    if (!cells.contains({new_r, new_c})) {
+                        frontiere.add({new_r, new_c});
+                    }
+                }
+                frontiere.remove(cell);
+            }
+        }
 };
+
+const CellList RegionBuild::evenNeighbours({{-1, -1}, {-1, 0}, {0, -1}, {0, 1}, {1, -1}, {1, 0}});
+const CellList RegionBuild::oddNeighbours({{-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, 0}, {1, 1}});
 
 int GenerateRandomMap(std::vector<RegionBuild>& regions, int r = 28, int c = 32, int subdivisionFactor = 6, int offsetFactor = 3, float maxTerritorySize = 5,int iteration = 30,bool testPrint = false) {
 
@@ -193,7 +196,7 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions, int r = 28, int c = 32,
             if(grid.getCell(xvalue,yvalue) != 0 || xvalue < 0 || xvalue >= c || yvalue < 0 || yvalue >= r) break;
             territoryID += 1;
             grid.setCell(xvalue,yvalue,territoryID);
-			RegionBuild region(r, c, maxTerritorySize, xvalue, yvalue, grid);
+			RegionBuild region(r, c, maxTerritorySize, xvalue, yvalue, &grid);
             region.id = territoryID;
             regions.push_back(region);
         }
@@ -231,8 +234,6 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions, int r = 28, int c = 32,
                 }
             }
         }
-
-
 
         ////////////////////////////
         ///PARTIE AFFICHAGE TESTS///
@@ -336,7 +337,6 @@ void LoadRandomMap(Regions& regions,unsigned int r,unsigned int c)
     //de la taille de la grille afin d'avoir un nombre de territoire homogène même avec une grille plus ou moins grande.
 	int rootMax = GenerateRandomMap(region2,r,c);
 
-	
     for (auto& r : region2) {
         if(r.Find()->id != rootMax) continue;
     	regions.push_back(r.cells.toUnsignedInt());
