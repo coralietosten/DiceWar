@@ -85,6 +85,7 @@ double probabilite_victoire(int attackerDice, int defenderDice)
     }
     
     // Attacker = 2
+    if (attackerDice == 2 && defenderDice == 1) return 80.80;
     if (attackerDice == 2 && defenderDice == 2) return 44.37;
     if (attackerDice == 2 && defenderDice == 3) return 15.20;
     if (attackerDice == 2 && defenderDice == 4) return 3.59;
@@ -94,6 +95,7 @@ double probabilite_victoire(int attackerDice, int defenderDice)
     if (attackerDice == 2 && defenderDice == 8) return 0.00;
 
     // Attacker = 3
+    if (attackerDice == 3 && defenderDice == 1) return 97.30;
     if (attackerDice == 3 && defenderDice == 2) return 77.85;
     if (attackerDice == 3 && defenderDice == 3) return 45.36;
     if (attackerDice == 3 && defenderDice == 4) return 19.17;
@@ -103,6 +105,7 @@ double probabilite_victoire(int attackerDice, int defenderDice)
     if (attackerDice == 3 && defenderDice == 8) return 0.05;
 
     // Attacker = 4
+    if (attackerDice == 4 && defenderDice == 1) return 99.73;
     if (attackerDice == 4 && defenderDice == 2) return 93.92;
     if (attackerDice == 4 && defenderDice == 3) return 74.28;
     if (attackerDice == 4 && defenderDice == 4) return 45.95;
@@ -112,6 +115,7 @@ double probabilite_victoire(int attackerDice, int defenderDice)
     if (attackerDice == 4 && defenderDice == 8) return 0.64;
 
     // Attacker = 5
+    if (attackerDice == 5 && defenderDice == 1) return 99.98;
     if (attackerDice == 5 && defenderDice == 2) return 98.79;
     if (attackerDice == 5 && defenderDice == 3) return 90.93;
     if (attackerDice == 5 && defenderDice == 4) return 71.81;
@@ -121,6 +125,7 @@ double probabilite_victoire(int attackerDice, int defenderDice)
     if (attackerDice == 5 && defenderDice == 8) return 3.67;
 
     // Attacker = 6
+    if (attackerDice == 6 && defenderDice == 1) return 100.00;
     if (attackerDice == 6 && defenderDice == 2) return 99.82;
     if (attackerDice == 6 && defenderDice == 3) return 97.53;
     if (attackerDice == 6 && defenderDice == 4) return 88.40;
@@ -130,6 +135,7 @@ double probabilite_victoire(int attackerDice, int defenderDice)
     if (attackerDice == 6 && defenderDice == 8) return 12.15;
 
     // Attacker = 7
+    if (attackerDice == 7 && defenderDice == 1) return 100.00;
     if (attackerDice == 7 && defenderDice == 2) return 99.98;
     if (attackerDice == 7 && defenderDice == 3) return 99.47;
     if (attackerDice == 7 && defenderDice == 4) return 96.15;
@@ -139,6 +145,7 @@ double probabilite_victoire(int attackerDice, int defenderDice)
     if (attackerDice == 7 && defenderDice == 8) return 27.44;
 
     // Attacker = 8
+    if (attackerDice == 8 && defenderDice == 1) return 100.00;
     if (attackerDice == 8 && defenderDice == 2) return 100.00;
     if (attackerDice == 8 && defenderDice == 3) return 99.91;
     if (attackerDice == 8 && defenderDice == 4) return 98.95;
