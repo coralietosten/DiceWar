@@ -303,32 +303,31 @@ void LoadRandomMap(Regions& regions,unsigned int r,unsigned int c)
 	regions.clear();
 	srand(static_cast<unsigned>(std::time(nullptr)));
     Regions2 region2 = {};
-    //Il serait possible de calculer le facteur de subdivision, la taille max des territoires ainsi que le nombre d'itération en fonction
-    //de la taille de la grille afin d'avoir un nombre de territoire homogène même avec une grille plus ou moins grande.
+    //les valeurs suivantes ont étées choisies arbitrairement pour avoir une bonne forme de carte, elles sont toujours modifiable.
 
     int mapSize = r*c;
-    int maximumGenerationTry = 3000;//pour ne pas que l'algo tourne indéfiniment, on définit un nombre d'essai maximum
+    int maximumGenerationTry = 1;//si l'on souhaite faire des tests avec un nombre de région limité (augmenter le nombre)
 
-    //les trois valeurs suivantes ont étées choisies arbitrairement pour avoir une bonne forme de carte, elles sont toujours modifiable.
     int minimumRegionNumber = 29;//on veut au minimum 16 régions
     int maximumRegionNumber = 35;//on veut au maximum 35 régions
-    int iteration = mapSize/40;
-    int territorySize = mapSize/80;
+    int iteration = 35;
+    int territorySize = 4;
 
     int regionAmount = 0;
     int rootMax = 0;
     int tryNumber = 0;
+    int subdivisionFactor = sqrt(mapSize)/3;
     
-    std::cout << "Generating a map with [map size : " << mapSize << " iteration : " << iteration << " territory size : " << territorySize << "]" << std::endl;
+    std::cout << "Generating a map with [map size : " << mapSize << ", iteration : " << iteration <<  ", subdivision : " << subdivisionFactor << ", territory size : " << territorySize << "]" << std::endl;
 
-    while(tryNumber < maximumGenerationTry && (regionAmount < minimumRegionNumber || regionAmount > maximumRegionNumber))
+    while(tryNumber < maximumGenerationTry) //&& (regionAmount < minimumRegionNumber || regionAmount > maximumRegionNumber))
     {
         int fillPercent = 50 + maximumGenerationTry/(maximumGenerationTry-tryNumber + 1)/2; //on fait varier le pourcentage de remplissage de 50 à 100 en fonction des tests;
         //std::cout << "try : " << tryNumber << std::endl;
         regionAmount = 0;
         region2 = {};
 
-        rootMax = GenerateRandomMap(region2,r,c,8,3,territorySize,iteration,fillPercent);
+        rootMax = GenerateRandomMap(region2,r,c,subdivisionFactor,3,territorySize,iteration,fillPercent);
     
         for (auto& r : region2) {
             if(r.Find()->id != rootMax) continue;
