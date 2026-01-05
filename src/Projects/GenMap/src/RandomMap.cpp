@@ -1,176 +1,142 @@
 #include "RandomMap.h"
 
-class Grid {
-    private:
-        int ncol;
-        int nrow;
-        std::vector<std::vector<int>> tab;
+#include <algorithm>
 
-    public:
-        Grid(int rows,int cols) : nrow(rows), ncol(cols) {
+
+const CellList RegionBuild::evenNeighbours({{-1, -1}, {-1, 0}, {0, -1}, {0, 1}, {1, -1}, {1, 0}});
+const CellList RegionBuild::oddNeighbours({{-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, 0}, {1, 1}});
+
+Grid::Grid(int rows,int cols) : nrow(rows), ncol(cols) {
             tab.resize(nrow, std::vector<int>(ncol, 0));
         }
-        ~Grid() = default;
+Grid::~Grid() = default;
 
-        int getCell(int x, int y) {
-            return (x >= 0 && x < nrow && y >= 0 && y < ncol) ? tab[x][y] : -1;
+int Grid::getCell(int x, int y) {
+    return (x >= 0 && x < nrow && y >= 0 && y < ncol) ? tab[x][y] : -1;
+}
+
+void Grid::setCell(int x, int y, int value, bool force) {
+    if (x >= 0 && x < nrow && y >= 0 && y < ncol && (tab[x][y] == 0 || force))
+        tab[x][y] = value;
+}
+
+CellList::CellList() = default;
+CellList::~CellList() = default;
+CellList::CellList(std::initializer_list<std::pair< int,  int>> init) {
+    for (auto& cell : init) {
+        cells.push_back(cell);
+    }
+}
+
+void CellList::add(const std::pair<int, int>& cell) {
+    cells.push_back(cell);
+}
+
+void CellList::remove(const std::pair<int, int>& cell) {
+    cells.erase(std::remove(cells.begin(), cells.end(), cell), cells.end());
+}
+
+auto CellList::begin() { return cells.begin(); }
+auto CellList::end() { return cells.end(); }
+
+auto CellList::begin() const { return cells.begin(); }
+auto CellList::end() const { return cells.end(); }
+
+std::pair<int, int> CellList::GetRandomCell() {
+    if (cells.empty()) {
+        return std::pair<int, int>(-1, -1);
+    }
+    int randomIndex = rand() % cells.size();
+    std::pair<int, int> randomCell = cells[randomIndex];
+    cells.erase(cells.begin() + randomIndex);
+    return randomCell;
+}
+
+bool CellList::contains(const std::pair< int,  int>& cell) const {
+    for (const auto& c : cells) {
+        if (c == cell) {
+            return true;
         }
+    }
+    return false; 
+}
 
-        void setCell(int x, int y, int value, bool force = false) {
-            if (x >= 0 && x < nrow && y >= 0 && y < ncol && (tab[x][y] == 0 || force))
-                tab[x][y] = value;
-        }
-};
-
-class CellList {
-    public:
-        std::vector<std::pair< int,  int>> cells;
-
-        CellList() = default;
-        ~CellList() = default;
-        CellList(std::initializer_list<std::pair< int,  int>> init) {
-            for (auto& cell : init) {
-                cells.push_back(cell);
-            }
-        }
-
-        void add(const std::pair<int, int>& cell) {
-            cells.push_back(cell);
-        }
-
-        void remove(const std::pair<int, int>& cell) {
-            cells.erase(std::remove(cells.begin(), cells.end(), cell), cells.end());
-        }
-
-        auto begin() { return cells.begin(); }
-        auto end() { return cells.end(); }
-
-        auto begin() const { return cells.begin(); }
-        auto end() const { return cells.end(); }
-
-        std::pair<int, int> GetRandomCell() {
-            if (cells.empty()) {
-                return std::pair<int, int>(-1, -1);
-            }
-            int randomIndex = rand() % cells.size();
-            std::pair<int, int> randomCell = cells[randomIndex];
-            cells.erase(cells.begin() + randomIndex);
-            return randomCell;
-        }
-
-        bool contains(const std::pair< int,  int>& cell) const {
-            for (const auto& c : cells) {
-                if (c == cell) {
-                    return true;
-                }
-            }
-            return false; 
-        }
-
-        std::vector<std::pair<unsigned int, unsigned int>> toUnsignedInt() const {
-            std::vector<std::pair<unsigned int, unsigned int>> unsignedCells;
-            
-            for (const auto& cell : cells) {
-                unsignedCells.push_back({static_cast<unsigned int>(cell.first), static_cast<unsigned int>(cell.second)});
-            }
-            
-            return unsignedCells;
-        }
+std::vector<std::pair<unsigned int, unsigned int>> CellList::toUnsignedInt() const {
+    std::vector<std::pair<unsigned int, unsigned int>> unsignedCells;
+    
+    for (const auto& cell : cells) {
+        unsignedCells.push_back({static_cast<unsigned int>(cell.first), static_cast<unsigned int>(cell.second)});
+    }
+    
+    return unsignedCells;
+}
 
 
-        friend std::ostream& operator<<(std::ostream& os, const CellList& list) {
-            os << "[ ";
-            for (const auto& cell : list.cells) {
-                os << "(" << cell.first << ", " << cell.second << ") ";
-            }
-            os << "]";
-            return os;
-        }
-};
 
-class RegionBuild {
-    private:
-        float maxSize;
-        std::pair<int, int> center;
 
-    public:
-        int id;
-        Grid *grid;
-        RegionBuild* parent;
-        int r;
-        int c;
-        static const CellList evenNeighbours;
-        static const CellList oddNeighbours;
-        CellList cells;
-        CellList border;
-
-        RegionBuild(int _r, int _c, float _maxSize, int _x, int _y, Grid* _grid): r(_r), c(_c), maxSize(_maxSize), grid(_grid) {
+RegionBuild::RegionBuild(int _r, int _c, float _maxSize, int _x, int _y, Grid* _grid): r(_r), c(_c), maxSize(_maxSize), grid(_grid) {
             center = {_x, _y};
             addCell(center);
             computeBorder(center);
             parent = nullptr;
         }
         
-        ~RegionBuild() = default;
+RegionBuild::~RegionBuild() = default;
 
-        void setGridCell(int x, int y, int value) {
-            grid->setCell(x, y, value);
-        }
+void RegionBuild::setGridCell(int x, int y, int value) {
+    grid->setCell(x, y, value);
+}
 
-        RegionBuild* Find() {
-            if (parent == nullptr) return this;
-            parent = parent->Find();
-            return parent;
-        }
+RegionBuild* RegionBuild::Find() {
+    if (parent == nullptr) return this;
+    parent = parent->Find();
+    return parent;
+}
 
-        void Union(RegionBuild* region) {
-            RegionBuild* root1 = Find();
-            RegionBuild* root2 = region -> Find();
-            if (root1 != root2) {
-                root1->parent = root2;
-            }
-        }
+void RegionBuild::Union(RegionBuild* region) {
+    RegionBuild* root1 = Find();
+    RegionBuild* root2 = region -> Find();
+    if (root1 != root2) {
+        root1->parent = root2;
+    }
+}
         
-        void addCell(std::pair<int, int> cell) {
-            cells.add(cell);
-            setGridCell(cell.first,cell.second,id);
-        }
+void RegionBuild::addCell(std::pair<int, int> cell) {
+    cells.add(cell);
+    setGridCell(cell.first,cell.second,id);
+}
 
-        float distance(std::pair<int, int> cell1, std::pair<int, int> cell2) {
-            int distx = cell2.first - cell1.first;
-            int disty = cell2.second - cell1.second;
-            return std::sqrt(distx * distx + disty * disty);
-        }
+float RegionBuild::distance(std::pair<int, int> cell1, std::pair<int, int> cell2) {
+    int distx = cell2.first - cell1.first;
+    int disty = cell2.second - cell1.second;
+    return std::sqrt(distx * distx + disty * disty);
+}
 
-        void enlargeBorder() {
-            std::pair<int, int> newcell = border.GetRandomCell();
-            if (grid->getCell(newcell.first,newcell.second) != 0) return;
-            if (cells.contains(newcell)) return;
-            if (newcell == std::pair<int, int>{-1, -1} || distance(newcell, center) > maxSize) return;
+void RegionBuild::enlargeBorder() {
+    std::pair<int, int> newcell = border.GetRandomCell();
+    if (grid->getCell(newcell.first,newcell.second) != 0) return;
+    if (cells.contains(newcell)) return;
+    if (newcell == std::pair<int, int>{-1, -1} || distance(newcell, center) > maxSize) return;
 
-            computeBorder(newcell);
-            addCell(newcell);
-        }
+    computeBorder(newcell);
+    addCell(newcell);
+}
 
-        void computeBorder(std::pair<int, int> cell) {
-            for (const auto& neighbour : ((cell.first % 2 == 0) ? evenNeighbours : oddNeighbours)) {
-                int new_r = neighbour.first + cell.first;
-                int new_c = neighbour.second + cell.second;
+void RegionBuild::computeBorder(std::pair<int, int> cell) {
+    for (const auto& neighbour : ((cell.first % 2 == 0) ? evenNeighbours : oddNeighbours)) {
+        int new_r = neighbour.first + cell.first;
+        int new_c = neighbour.second + cell.second;
 
-                if (new_r >= 0 && new_c >= 0 && new_r < r && new_c < c) {
-                    if (!cells.contains({new_r, new_c})) {
-                        border.add({new_r, new_c});
-                    }
-                }
-                border.remove(cell);
+        if (new_r >= 0 && new_c >= 0 && new_r < r && new_c < c) {
+            if (!cells.contains({new_r, new_c})) {
+                border.add({new_r, new_c});
             }
         }
-};
+        border.remove(cell);
+    }
+}
 
-const CellList RegionBuild::evenNeighbours({{-1, -1}, {-1, 0}, {0, -1}, {0, 1}, {1, -1}, {1, 0}});
-const CellList RegionBuild::oddNeighbours({{-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, 0}, {1, 1}});
-
-int GenerateRandomMap(std::vector<RegionBuild>& regions,int r = 28, int c = 32, int subdivisionFactor = 6, int offsetFactor = 3, float maxTerritorySize = 5,int iteration = 35,  int fillPercent = 100, bool testPrint = false) {
+int GenerateRandomMap(std::vector<RegionBuild>& regions,int r, int c, int subdivisionFactor, int offsetFactor, float maxTerritorySize, int iteration, int fillPercent, bool testPrint) {
 
     //Les origines des territoires sont réparties uniformément sur la grille d'hexagone (avec un léger décalage aléatoire pour chaque centre afin de rendre le tout plus organique). Depuis ces origines, les territoires s'étendent un par un et s'arrête quand ils ne peuvent plus s'étendre (ils ne peuvent pas s'étendre sur un autre territoire et ont un rayon maximum d'expansion). Enfin, on supprime les territoires qui n'ont pas assez de cases et qui ne déconnectent pas le graphe. 
     //sizeX : largeur de la carte (32 sur le site dicewars)
@@ -341,7 +307,7 @@ void LoadRandomMap(Regions& regions,unsigned int r,unsigned int c)
     //de la taille de la grille afin d'avoir un nombre de territoire homogène même avec une grille plus ou moins grande.
 
     int mapSize = r*c;
-    int maximumGenerationTry = 1024;//pour ne pas que l'algo tourne indéfiniment, on définit un nombre d'essai maximum
+    int maximumGenerationTry = 3000;//pour ne pas que l'algo tourne indéfiniment, on définit un nombre d'essai maximum
 
     //les trois valeurs suivantes ont étées choisies arbitrairement pour avoir une bonne forme de carte, elles sont toujours modifiable.
     int minimumRegionNumber = 29;//on veut au minimum 16 régions
