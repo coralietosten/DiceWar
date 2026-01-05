@@ -67,17 +67,17 @@ Nous allons utiliser :
 ```
 double probabilite_victoire(int attackerDice, int defenderDice) 
 {
-    if (attackerDice <= 2 )
+    if (attackerDice <= 1 )
     {
-        attackerDice = 2;
+        return 0.00;
     }
     if (attackerDice >= 8 )
     {
         attackerDice = 8;
     }
-    if (defenderDice <= 2 )
+    if (defenderDice <= 1 )
     {
-        defenderDice = 2;
+        defenderDice = 1;
     }
     if (defenderDice >= 8 )
     {
