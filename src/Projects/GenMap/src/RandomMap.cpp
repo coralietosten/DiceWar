@@ -1,8 +1,5 @@
 #include "RandomMap.h"
 
-#include <algorithm>
-
-
 const CellList RegionBuild::evenNeighbours({{-1, -1}, {-1, 0}, {0, -1}, {0, 1}, {1, -1}, {1, 0}});
 const CellList RegionBuild::oddNeighbours({{-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, 0}, {1, 1}});
 

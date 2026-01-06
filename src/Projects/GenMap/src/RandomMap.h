@@ -1,16 +1,9 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
-#include <array>
-#include <utility>
-#include <cstdlib>
 #include <ctime>
 #include <cmath> 
-#include <iostream>
-#include <typeinfo>
-#include <map>
-#include <set>
+#include <vector>
 #include <unordered_map>
 
 #include "MapLoader.h"
