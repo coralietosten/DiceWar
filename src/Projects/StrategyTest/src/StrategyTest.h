@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../../../Commun/IStrategyLib.h"
+// #include "IdentifyClusters.h"
+
 
 class StrategyTest
 {
@@ -14,9 +16,12 @@ public:
 
 public:
 	bool PlayTurn(unsigned int gameTurn, const SGameState *state, STurn *turn);
+	void update(const SGameState* state);
 
 protected:
 	const unsigned int Id;
 	const unsigned int NbPlayer;
 	SMap Map;
 };
+
+

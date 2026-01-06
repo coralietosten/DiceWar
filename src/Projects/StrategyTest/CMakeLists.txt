@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.14)
+﻿cmake_minimum_required (VERSION 3.8)
 
 set(LIB_NAME "strategytest")
 
@@ -12,6 +12,8 @@ add_library(${LIB_NAME} MODULE
  "src/StrategyTest.cpp"
  "src/StrategyTest.h"
  "src/interface_lib.h"
+ "src/IdentifyClusters.cpp"
+ "src/IdentifyClusters.h"
 )
 
 setup_opt(${LIB_NAME})
