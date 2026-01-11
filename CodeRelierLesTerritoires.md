@@ -74,8 +74,12 @@ Sans le continue : Le code en dessous s'exécuterait (calcul de proba, appel ré
 Avec le continue : Le code saute immédiatement à la fin de l'accolade de la boucle for pour passer au voisin i+1.
 */
 
-
-
+        if(neighbor->infos.owner == current->infos.owner)
+        {
+            // C'est à nous -> On ne peut pas attaquer notre propre cellule
+            continue; 
+        }
+        
         // etape 2 : Calculer la probabilité de gagner contre ce voisin
 
         // Attaquant : current_dice
