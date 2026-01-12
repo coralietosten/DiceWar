@@ -349,30 +349,35 @@ void LoadRandomMap(Regions& regions,unsigned int r,unsigned int c)
 	regions.clear();
 	srand(static_cast<unsigned>(std::time(nullptr)));
     Regions2 region2 = {};
-    //les valeurs suivantes ont étées choisies arbitrairement pour avoir une bonne forme de carte, elles sont toujours modifiable.
 
     int mapSize = r*c;
+
+    /////////////////////////////////////
+    ///// PARAMETRES DE L'ALGORITHME/////
+    /////////////////////////////////////
+    //les valeurs suivantes ont étées choisies arbitrairement pour avoir une bonne forme de carte, elles sont toujours modifiable.
     int maximumGenerationTry = 1;//si l'on souhaite faire des tests avec un nombre de région limité (augmenter le nombre)
 
     int minimumRegionNumber = 29;
     int maximumRegionNumber = 35;
     int iteration = 35;
     int territorySize = 4;
+    int offsetFactor = 3;
+
+    /////////////////////////////////////
 
     int regionAmount = 0;
     int rootMax = 0;
     int tryNumber = 0;
     int subdivisionFactor = sqrt(mapSize)/3;
     
-    std::cout << "Generating a map with [map size : " << mapSize << ", iteration : " << iteration <<  ", subdivision : " << subdivisionFactor << ", territory size : " << territorySize << "]" << std::endl;
-
     while(tryNumber < maximumGenerationTry)
     {
         int fillPercent = 50 + maximumGenerationTry/(maximumGenerationTry-tryNumber + 1)/2; //on fait varier le pourcentage de remplissage de 50 à 100 en fonction des tests;
         regionAmount = 0;
         region2 = {};
 
-        rootMax = GenerateRandomMap(region2,r,c,subdivisionFactor,3,territorySize,iteration,fillPercent);
+        rootMax = GenerateRandomMap(region2,r,c,subdivisionFactor,offsetFactor,territorySize,iteration,fillPercent);
     
         for (auto& r : region2) {
             if(r.Find()->getId() != rootMax) continue;
