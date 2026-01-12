@@ -12,7 +12,9 @@ Grid::Grid(int rows,int cols) : nrow(rows), ncol(cols){
     tab.resize(nrow, std::vector<int>(ncol, 0));
 }
 
-std::vector<std::pair< int,  int>> CellList::GetCells(){return cells;};
+std::vector<std::pair< int,  int>> CellList::getCells(){
+    return cells;
+};
 
 Grid::~Grid() = default;
 
@@ -48,7 +50,7 @@ auto CellList::end() { return cells.end(); }
 auto CellList::begin() const { return cells.begin(); }
 auto CellList::end() const { return cells.end(); }
 
-std::pair<int, int> CellList::GetRandomCell() {
+std::pair<int, int> CellList::getRandomCell() {
     if (cells.empty()) {
         return std::pair<int, int>(-1, -1);
     }
@@ -82,31 +84,31 @@ std::vector<std::pair<unsigned int, unsigned int>> CellList::toUnsignedInt() con
 //////////////////////
 
 
-int RegionBuild::GetId(){
+int RegionBuild::getId(){
     return id;
 };
 
-void RegionBuild::SetId(int value){
+void RegionBuild::setId(int value){
     id = value;
 };
 
-int RegionBuild::GetRowSize(){
+int RegionBuild::getRowSize(){
     return rowSize;
 };
 
-int RegionBuild::GetColSize(){
+int RegionBuild::getColSize(){
     return colSize;
 };
 
-Grid *RegionBuild::GetGrid(){
+Grid *RegionBuild::getGrid(){
     return grid;
 };
 
-CellList RegionBuild::GetCells(){
+CellList RegionBuild::getCells(){
     return cells;
 };
 
-CellList RegionBuild::GetBorder(){
+CellList RegionBuild::getBorder(){
     return border;
 };
 
@@ -149,7 +151,7 @@ float RegionBuild::distance(std::pair<int, int> cell1, std::pair<int, int> cell2
 }
 
 void RegionBuild::enlargeBorder() {
-    std::pair<int, int> newcell = border.GetRandomCell();
+    std::pair<int, int> newcell = border.getRandomCell();
     if (grid->getCell(newcell.first,newcell.second) != 0) return;
     if (cells.contains(newcell)) return;
     if (newcell == std::pair<int, int>{-1, -1} || distance(newcell, center) > maxSize) return;
@@ -202,7 +204,7 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions,int r, int c, int subdiv
                 territoryID += 1;
                 grid.setCell(xvalue,yvalue,territoryID);
                 RegionBuild region(r, c, maxTerritorySize, xvalue, yvalue, &grid);
-                region.SetId(territoryID);
+                region.setId(territoryID);
                 regions.push_back(region);
             }
         }
@@ -223,9 +225,9 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions,int r, int c, int subdiv
         ///UNIR ET TROUVER///
         /////////////////////
         std::set<int> result;
-        for (const auto& c : r.GetBorder().GetCells()) {
+        for (const auto& c : r.getBorder().getCells()) {
             int neighbourId = grid.getCell(c.first, c.second);
-            if (neighbourId > 0 && neighbourId != r.GetId()) {
+            if (neighbourId > 0 && neighbourId != r.getId()) {
                 result.insert(neighbourId);
             }
         }
@@ -234,7 +236,7 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions,int r, int c, int subdiv
         for(auto& i : result){
             for(auto& r2 : regions)
             {
-                if(r2.GetId() == i)
+                if(r2.getId() == i)
                 {
                     r.Union(&r2);
                 }
@@ -246,11 +248,11 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions,int r, int c, int subdiv
         ////////////////////////////
         if(testPrint)
         {
-            for (auto& c : r.GetBorder().toUnsignedInt())
+            for (auto& c : r.getBorder().toUnsignedInt())
             {
                 grid2.setCell(c.first,c.second*2 + (c.first % 2 == 0 ? 0 : 1),2);
             }
-            for (auto& c : r.GetCells().toUnsignedInt())
+            for (auto& c : r.getCells().toUnsignedInt())
             {
                 int cellx = c.first;
                 int celly = c.second*2 + (c.first % 2 == 0 ? 0 : 1);
@@ -302,27 +304,27 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions,int r, int c, int subdiv
     //////////////////////////////////////
     ///GESTION DES COMPOSANTES CONNEXES///
     //////////////////////////////////////
-    std::unordered_map<RegionBuild*, int> taillesComposantes;
+    std::unordered_map<RegionBuild*, int> componentSizes;
     for(auto& r : regions)
     {
-        taillesComposantes[r.Find()] += 1;
+        componentSizes[r.Find()] += 1;
     }
     
-    int taillemax=0;
+    int maxSize=0;
     int rootmax=-1;
-    for (const auto& [root, taille] : taillesComposantes) {
-        if(taille > taillemax)
+    for (const auto& [root, size] : componentSizes) {
+        if(size > maxSize)
         {
-            taillemax = taille;
-            rootmax = root->GetId();
+            maxSize = size;
+            rootmax = root->getId();
         }
     }
 
     for(auto& r : regions)
     {
-        if(r.Find()->GetId() != rootmax)
+        if(r.Find()->getId() != rootmax)
         {
-            for(auto& c : r.GetCells().GetCells())
+            for(auto& c : r.getCells().getCells())
             {
                 grid.setCell(c.first,c.second,0);
             }
@@ -365,7 +367,7 @@ void LoadRandomMap(Regions& regions,unsigned int r,unsigned int c)
         rootMax = GenerateRandomMap(region2,r,c,subdivisionFactor,3,territorySize,iteration,fillPercent);
     
         for (auto& r : region2) {
-            if(r.Find()->GetId() != rootMax) continue;
+            if(r.Find()->getId() != rootMax) continue;
             regionAmount ++;
         }
 
@@ -373,7 +375,7 @@ void LoadRandomMap(Regions& regions,unsigned int r,unsigned int c)
     }
 
     for (auto& r : region2) {
-        if(r.Find()->GetId() != rootMax) continue;
-    	regions.push_back(r.GetCells().toUnsignedInt());
+        if(r.Find()->getId() != rootMax) continue;
+    	regions.push_back(r.getCells().toUnsignedInt());
     }
 }

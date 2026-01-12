@@ -28,7 +28,7 @@ class CellList {
     private:
         std::vector<std::pair< int,  int>> cells;
     public:
-        std::vector<std::pair< int,  int>> GetCells();
+        std::vector<std::pair< int,  int>> getCells();
         CellList();
         ~CellList();
         explicit CellList(std::initializer_list<std::pair< int,  int>> init);
@@ -43,7 +43,7 @@ class CellList {
         auto begin() const;
         auto end() const;
 
-        std::pair<int, int> GetRandomCell();
+        std::pair<int, int> getRandomCell();
 
         bool contains(const std::pair< int,  int>& cell) const;
         
@@ -70,16 +70,16 @@ class RegionBuild {
         CellList border;
         Grid *grid;
     public:
-        int GetId();
-        void SetId(int value);
-        int GetRowSize();
-        int GetColSize();
-        Grid *GetGrid();
+        int getId();
+        void setId(int value);
+        int getRowSize();
+        int getColSize();
+        Grid *getGrid();
         RegionBuild* parent;
         static const CellList evenNeighbours;
         static const CellList oddNeighbours;
-        CellList GetCells();
-        CellList GetBorder();
+        CellList getCells();
+        CellList getBorder();
 
         RegionBuild(int _r, int _c, float _maxSize, int _x, int _y, Grid* _grid);
         
