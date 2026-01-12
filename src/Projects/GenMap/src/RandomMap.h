@@ -31,7 +31,7 @@ class CellList {
         std::vector<std::pair< int,  int>> GetCells();
         CellList();
         ~CellList();
-        CellList(std::initializer_list<std::pair< int,  int>> init);
+        explicit CellList(std::initializer_list<std::pair< int,  int>> init);
 
         void add(const std::pair<int, int>& cell);
 
