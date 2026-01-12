@@ -2,7 +2,7 @@
 
 #include "StrategyTest.h"
 #include <iostream>
-#include "IdentifyClusters.h"
+#include "Utilities.h"
 #include <stdlib.h>
 #include <vector>
 #include <set>
@@ -74,12 +74,18 @@ bool StrategyTest::PlayTurn(unsigned int gameTurn, const SGameState* state, STur
 	// d�rouler votre algorithme de choix
 	if (gameTurn == 1) {
 		std::vector<SCell> territoire_joueur_1 = PlayerCells(Map, 0);
-		std::cout << " est la liste des territoires du joueur 1" << territoire_joueur_1;
+		// std::cout << " est la liste des territoires du joueur 1" << territoire_joueur_1;
 		std::vector<SCell> territoire_joueur_2 = PlayerCells(Map, 1);
-		std::cout << "ceci est la liste des territoires du joueur 2" << territoire_joueur_2;
+		// std::cout << "ceci est la liste des territoires du joueur 2" << territoire_joueur_2;
 		std::vector<std::vector<SCell>> clusters = IdentifyClusters(territoire_joueur_2, 1);
 		std::cout << clusters;
 		std::cout <<std::endl;
+
+		// std::cout << WidthPath(Map,territoire_joueur_1[0]);
+
+		Connection* c = SCellToConnect(Map, 1);
+		std::cout << *c << std::endl;
+
 	
 		std::cout<<"NB JOUEURS : "<<NbPlayer<<std::endl;
 		std::cout<<"Id : "<<Id<<std::endl;

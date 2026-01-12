@@ -12,8 +12,8 @@ add_library(${LIB_NAME} MODULE
  "src/StrategyTest.cpp"
  "src/StrategyTest.h"
  "src/interface_lib.h"
- "src/IdentifyClusters.cpp"
- "src/IdentifyClusters.h"
+ "src/Utilities.cpp"
+ "src/Utilities.h"
 )
 
 setup_opt(${LIB_NAME})

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../../Commun/IStrategyLib.h"
-// #include "IdentifyClusters.h"
 
 
 class StrategyTest
