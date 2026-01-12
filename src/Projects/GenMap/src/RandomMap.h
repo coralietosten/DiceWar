@@ -25,8 +25,10 @@ class Grid {
 };
 
 class CellList {
-    public:
+    private:
         std::vector<std::pair< int,  int>> cells;
+    public:
+        std::vector<std::pair< int,  int>> GetCells();
         CellList();
         ~CellList();
         CellList(std::initializer_list<std::pair< int,  int>> init);
@@ -47,13 +49,13 @@ class CellList {
         
         std::vector<std::pair<unsigned int, unsigned int>> toUnsignedInt() const;
 
-        friend std::ostream& operator<<(std::ostream& os, const CellList& list) {
-        os << "[ ";
+        friend std::ostream& operator<<(std::ostream& stream, const CellList& list) {
+        stream << "[ ";
         for (const auto& cell : list.cells) {
-            os << "(" << cell.first << ", " << cell.second << ") ";
+            stream << "(" << cell.first << ", " << cell.second << ") ";
         }
-        os << "]";
-        return os;
+        stream << "]";
+        return stream;
     };
 };
 
@@ -61,17 +63,23 @@ class RegionBuild {
     private:
         float maxSize;
         std::pair<int, int> center;
-
-    public:
+        int rowSize;
+        int colSize;
         int id;
-        Grid *grid;
-        RegionBuild* parent;
-        int r;
-        int c;
-        static const CellList evenNeighbours;
-        static const CellList oddNeighbours;
         CellList cells;
         CellList border;
+        Grid *grid;
+    public:
+        int GetId();
+        void SetId(int value);
+        int GetRowSize();
+        int GetColSize();
+        Grid *GetGrid();
+        RegionBuild* parent;
+        static const CellList evenNeighbours;
+        static const CellList oddNeighbours;
+        CellList GetCells();
+        CellList GetBorder();
 
         RegionBuild(int _r, int _c, float _maxSize, int _x, int _y, Grid* _grid);
         

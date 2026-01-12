@@ -1,11 +1,19 @@
 #include "RandomMap.h"
 
+//////////////////
+/////CELL LIST////
+//////////////////
+
+
 const CellList RegionBuild::evenNeighbours({{-1, -1}, {-1, 0}, {0, -1}, {0, 1}, {1, -1}, {1, 0}});
 const CellList RegionBuild::oddNeighbours({{-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, 0}, {1, 1}});
 
-Grid::Grid(int rows,int cols) : nrow(rows), ncol(cols) {
-            tab.resize(nrow, std::vector<int>(ncol, 0));
-        }
+Grid::Grid(int rows,int cols) : nrow(rows), ncol(cols){
+    tab.resize(nrow, std::vector<int>(ncol, 0));
+}
+
+std::vector<std::pair< int,  int>> CellList::GetCells(){return cells;};
+
 Grid::~Grid() = default;
 
 int Grid::getCell(int x, int y) {
@@ -24,6 +32,7 @@ CellList::CellList(std::initializer_list<std::pair< int,  int>> init) {
         cells.push_back(cell);
     }
 }
+
 
 void CellList::add(const std::pair<int, int>& cell) {
     cells.push_back(cell);
@@ -68,10 +77,40 @@ std::vector<std::pair<unsigned int, unsigned int>> CellList::toUnsignedInt() con
     return unsignedCells;
 }
 
+//////////////////////
+/////REGION BUILD/////
+//////////////////////
 
 
+int RegionBuild::GetId(){
+    return id;
+};
 
-RegionBuild::RegionBuild(int _r, int _c, float _maxSize, int _x, int _y, Grid* _grid): r(_r), c(_c), maxSize(_maxSize), grid(_grid) {
+void RegionBuild::SetId(int value){
+    id = value;
+};
+
+int RegionBuild::GetRowSize(){
+    return rowSize;
+};
+
+int RegionBuild::GetColSize(){
+    return colSize;
+};
+
+Grid *RegionBuild::GetGrid(){
+    return grid;
+};
+
+CellList RegionBuild::GetCells(){
+    return cells;
+};
+
+CellList RegionBuild::GetBorder(){
+    return border;
+};
+
+RegionBuild::RegionBuild(int _r, int _c, float _maxSize, int _x, int _y, Grid* _grid): rowSize(_r), colSize(_c), maxSize(_maxSize), grid(_grid) {
             center = {_x, _y};
             addCell(center);
             computeBorder(center);
@@ -124,7 +163,7 @@ void RegionBuild::computeBorder(std::pair<int, int> cell) {
         int new_r = neighbour.first + cell.first;
         int new_c = neighbour.second + cell.second;
 
-        if (new_r >= 0 && new_c >= 0 && new_r < r && new_c < c) {
+        if (new_r >= 0 && new_c >= 0 && new_r < rowSize && new_c < colSize) {
             if (!cells.contains({new_r, new_c})) {
                 border.add({new_r, new_c});
             }
@@ -163,7 +202,7 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions,int r, int c, int subdiv
                 territoryID += 1;
                 grid.setCell(xvalue,yvalue,territoryID);
                 RegionBuild region(r, c, maxTerritorySize, xvalue, yvalue, &grid);
-                region.id = territoryID;
+                region.SetId(territoryID);
                 regions.push_back(region);
             }
         }
@@ -184,9 +223,9 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions,int r, int c, int subdiv
         ///UNIR ET TROUVER///
         /////////////////////
         std::set<int> result;
-        for (const auto& c : r.border.cells) {
+        for (const auto& c : r.GetBorder().GetCells()) {
             int neighbourId = grid.getCell(c.first, c.second);
-            if (neighbourId > 0 && neighbourId != r.id) {
+            if (neighbourId > 0 && neighbourId != r.GetId()) {
                 result.insert(neighbourId);
             }
         }
@@ -195,7 +234,7 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions,int r, int c, int subdiv
         for(auto& i : result){
             for(auto& r2 : regions)
             {
-                if(r2.id == i)
+                if(r2.GetId() == i)
                 {
                     r.Union(&r2);
                 }
@@ -207,11 +246,11 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions,int r, int c, int subdiv
         ////////////////////////////
         if(testPrint)
         {
-            for (auto& c : r.border.toUnsignedInt())
+            for (auto& c : r.GetBorder().toUnsignedInt())
             {
                 grid2.setCell(c.first,c.second*2 + (c.first % 2 == 0 ? 0 : 1),2);
             }
-            for (auto& c : r.cells.toUnsignedInt())
+            for (auto& c : r.GetCells().toUnsignedInt())
             {
                 int cellx = c.first;
                 int celly = c.second*2 + (c.first % 2 == 0 ? 0 : 1);
@@ -275,15 +314,15 @@ int GenerateRandomMap(std::vector<RegionBuild>& regions,int r, int c, int subdiv
         if(taille > taillemax)
         {
             taillemax = taille;
-            rootmax = root->id;
+            rootmax = root->GetId();
         }
     }
 
     for(auto& r : regions)
     {
-        if(r.Find()->id != rootmax)
+        if(r.Find()->GetId() != rootmax)
         {
-            for(auto& c : r.cells.cells)
+            for(auto& c : r.GetCells().GetCells())
             {
                 grid.setCell(c.first,c.second,0);
             }
@@ -305,8 +344,8 @@ void LoadRandomMap(Regions& regions,unsigned int r,unsigned int c)
     int mapSize = r*c;
     int maximumGenerationTry = 1;//si l'on souhaite faire des tests avec un nombre de région limité (augmenter le nombre)
 
-    int minimumRegionNumber = 29;//on veut au minimum 16 régions
-    int maximumRegionNumber = 35;//on veut au maximum 35 régions
+    int minimumRegionNumber = 29;
+    int maximumRegionNumber = 35;
     int iteration = 35;
     int territorySize = 4;
 
@@ -317,17 +356,16 @@ void LoadRandomMap(Regions& regions,unsigned int r,unsigned int c)
     
     std::cout << "Generating a map with [map size : " << mapSize << ", iteration : " << iteration <<  ", subdivision : " << subdivisionFactor << ", territory size : " << territorySize << "]" << std::endl;
 
-    while(tryNumber < maximumGenerationTry) //&& (regionAmount < minimumRegionNumber || regionAmount > maximumRegionNumber))
+    while(tryNumber < maximumGenerationTry)
     {
         int fillPercent = 50 + maximumGenerationTry/(maximumGenerationTry-tryNumber + 1)/2; //on fait varier le pourcentage de remplissage de 50 à 100 en fonction des tests;
-        //std::cout << "try : " << tryNumber << std::endl;
         regionAmount = 0;
         region2 = {};
 
         rootMax = GenerateRandomMap(region2,r,c,subdivisionFactor,3,territorySize,iteration,fillPercent);
     
         for (auto& r : region2) {
-            if(r.Find()->id != rootMax) continue;
+            if(r.Find()->GetId() != rootMax) continue;
             regionAmount ++;
         }
 
@@ -335,7 +373,7 @@ void LoadRandomMap(Regions& regions,unsigned int r,unsigned int c)
     }
 
     for (auto& r : region2) {
-        if(r.Find()->id != rootMax) continue;
-    	regions.push_back(r.cells.toUnsignedInt());
+        if(r.Find()->GetId() != rootMax) continue;
+    	regions.push_back(r.GetCells().toUnsignedInt());
     }
 }
