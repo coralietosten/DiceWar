@@ -69,17 +69,20 @@ class RegionBuild {
         CellList cells;
         CellList border;
         Grid *grid;
+        RegionBuild* parent;
     public:
         int getId();
         void setId(int value);
         int getRowSize();
         int getColSize();
         Grid *getGrid();
-        RegionBuild* parent;
-        static const CellList evenNeighbours;
-        static const CellList oddNeighbours;
         CellList getCells();
         CellList getBorder();
+        RegionBuild* getParent();
+        void setParent(RegionBuild* parent);
+        
+        static const CellList evenNeighbours;
+        static const CellList oddNeighbours;
 
         RegionBuild(int _r, int _c, float _maxSize, int _x, int _y, Grid* _grid);
         

@@ -112,6 +112,14 @@ CellList RegionBuild::getBorder(){
     return border;
 };
 
+RegionBuild* RegionBuild::getParent(){
+    return parent;
+};
+
+void RegionBuild::setParent(RegionBuild* value){
+    parent = value;
+};
+
 RegionBuild::RegionBuild(int _r, int _c, float _maxSize, int _x, int _y, Grid* _grid): rowSize(_r), colSize(_c), maxSize(_maxSize), grid(_grid) {
             center = {_x, _y};
             addCell(center);
@@ -135,7 +143,7 @@ void RegionBuild::Union(RegionBuild* region) {
     RegionBuild* root1 = Find();
     RegionBuild* root2 = region -> Find();
     if (root1 != root2) {
-        root1->parent = root2;
+        root1->setParent(root2);
     }
 }
         
