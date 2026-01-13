@@ -4,58 +4,47 @@
 #include <set>
 #include <algorithm>
 #include <queue>
+#include <stack>
 #include <iterator>
+
 
 
 std::vector<std::vector<SCell>> IdentifyClusters(const std::vector<SCell>& cellsPlayer, unsigned int player){
     // IdentifyCluster : Fonction qui renvoie les clusters des cellules d'un joueur, un cluster correspond 
-    // à un ensemble de cellule qui forment un territoire (cellules côte à côte)
-    // Paramètres :
-    //      cellsPlayer (const std::vector<SCell>&) : les cellules qu'occupe le joueur
-    //      player (unsigned int): l'id du joueur
-    // Sortie :
-    //      clusters (std::vector<std::set<SCell>>) : clusters des cellules appartenant à un joueur
-    std::vector<std::vector<SCell>> clusters; 
-    if (cellsPlayer.size() == 0){
-        return clusters;
-    }
-    //recuperation des voisins de chaque cellule
-    for (int i = 0; i < cellsPlayer.size(); i++){
-        std::vector<SCell> c;
-        c.push_back(cellsPlayer[i]);
-        for (int k = 0; k < cellsPlayer[i].nbNeighbors; k ++){
-            SCell *voisin = cellsPlayer[i].neighbors[k];
-            if(voisin != nullptr){
-                unsigned int n = voisin->infos.owner;
-                if (n == player){
-                    c.push_back(*voisin);
+     // à un ensemble de cellule qui forment un territoire (cellules côte à côte)
+     // Paramètres :
+     //      cellsPlayer (const std::vector<SCell>&) : les cellules qu'occupe le joueur
+     //      player (unsigned int): l'id du joueur
+     // Sortie :
+     //      clusters (std::vector<std::set<SCell>>) : clusters des cellules appartenant à un joueur
+    
+    std::vector<std::vector<SCell>> clusters;
+
+    std::vector<SCell> visited;
+
+    for (int i =0; i< cellsPlayer.size(); i++){
+        if (!contains(visited, cellsPlayer[i])){
+            std::vector<SCell> cluster;
+            
+            //parcours en prodondeur
+            std::stack<SCell> p;
+            SCell s;
+            p.push(cellsPlayer[i]);
+            while (!p.empty()){
+                s = p.top();
+                p.pop();
+                if (!contains(visited, s)){
+                    visited.push_back(s);
+                    cluster.push_back(s);
+                    for (int j =0; j< s.nbNeighbors; j++){
+                        SCell* neighbor = s.neighbors[j];
+                        if ( neighbor->infos.owner == player && !contains(visited, *neighbor)){
+                            p.push(*neighbor);
+                        }
+                    }
                 }
             }
-        }
-        //ajout du vecteur des voisins dans clusters
-        if (clusters.empty()){
-            clusters.push_back(c);
-        }
-        else{
-            bool inCluster = false;
-            int j = 0;
-            while (inCluster == false && j < clusters.size() ){
-                for (int l = 0; l < c.size(); l++){
-                    if (contains(clusters[j], c[l])){
-                        inCluster = true;
-                        std::vector<SCell> temp;
-                        std::sort(clusters[j].begin(), clusters[j].end(), comparator);
-                        std::sort(c.begin(), c.end(), comparator);
-                        std::set_union(clusters[j].begin(), clusters[j].end(), c.begin(), c.end(), std::back_inserter(temp),comparator);
-                        clusters[j] = temp;
-                        break;
-                    }
-                }            
-                j++;
-            }
-            if (inCluster ==false ){
-                clusters.push_back(c);
-            }
+            clusters.push_back(cluster);
         }
     }
     return clusters;

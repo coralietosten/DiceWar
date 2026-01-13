@@ -13,6 +13,12 @@ struct Connection{
     int distance;
 };
 
+// std::vector<std::vector<SCell>> IdentifyClusters(const std::vector<SCell>& cellsPlayer, unsigned int player);
+
+int find(std::vector<int> parent, int x);
+
+void union1(std::vector<int> parent, int a, int b);
+
 std::vector<std::vector<SCell>> IdentifyClusters(const std::vector<SCell>& cellsPlayer, unsigned int player);
 
 std::vector<SCell> PlayerCells(const SMap& map, int player);
