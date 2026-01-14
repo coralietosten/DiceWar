@@ -8,10 +8,9 @@
 #include <iterator>
 
 
-
 std::vector<std::vector<SCell>> IdentifyClusters(const std::vector<SCell>& cellsPlayer, unsigned int player){
     // IdentifyCluster : Fonction qui renvoie les clusters des cellules d'un joueur, un cluster correspond 
-     // à un ensemble de cellule qui forment un territoire (cellules côte à côte)
+     // à un ensemble de cellules qui forment un territoire (cellules côte à côte)
      // Paramètres :
      //      cellsPlayer (const std::vector<SCell>&) : les cellules qu'occupe le joueur
      //      player (unsigned int): l'id du joueur
@@ -51,7 +50,7 @@ std::vector<std::vector<SCell>> IdentifyClusters(const std::vector<SCell>& cells
 }
 
 
-std::vector<SCell> PlayerCells(const SMap& map, int player){
+std::vector<SCell> PlayerCells(const SMap& map, unsigned int player){
     // PlayerCells : Fonction qui calcul les cellules appartenant à un joueur
     //
     // Paramètres : 
@@ -111,15 +110,6 @@ bool is_egal(const SCell& c1, const SCell& c2){
     return c1.infos.id == c2.infos.id;  
 }
 
-bool comparator(const SCell& c1, const SCell& c2){
-    return c1.infos.id < c2.infos.id;
-}
-
-bool comparator_connection(const Connection& c1, const Connection& c2){
-    return c1.distance < c2.distance;
-}
-
-
 bool contains(const std::vector<SCell>& v, const SCell& c2){
     return std::find_if(v.begin(), v.end(),[&](const SCell& c){ return is_egal(c, c2);}) != v.end();
 }
@@ -128,13 +118,17 @@ Connection* SCellToConnect (const SMap& map, unsigned int player){
     // critères de connection de 2 cellules :
     // territoires les plus proches
     // avec le plus de dés
-    // avec le moins de territoires adjacents adverses/ avec le moins de territoires adjacents forts(avec plus de dé que nos territoires)
     // rejoindre les clusters qui regroupe le plus de cellules
+    // avec le moins de territoires adjacents adverses/ avec le moins de territoires adjacents forts(avec plus de dé que nos territoires)
     std::vector<std::vector<SCell>> clusters = IdentifyClusters(PlayerCells(map, player), player);
+
+    //tri de clusters par taille des clusters
+    std::sort(clusters.begin(), clusters.end(), [](std::vector<SCell> v1, std::vector<SCell> v2){
+        return v1.size() > v2.size();
+    });
 
     //cas ou il n'ya pas qu'un seul cluster 
     if (clusters.size() > 1){
-        std::cout << "ici" << std::endl;
         std::vector<Connection> connections;
         for (int i = 0; i< clusters.size(); i++){
             for (int j = i+1; j < clusters.size(); j++){
@@ -150,9 +144,7 @@ Connection* SCellToConnect (const SMap& map, unsigned int player){
                             c.Arrivee = clusters[j][l];
                             c.Depart = clusters[i][k];
                         }
-                        // std::cout << "ici " << c.Arrivee << c.Depart << std::endl;
                         c.distance = distance(map, clusters[i][k], clusters[j][l]);
-                        // std::cout <<c ;
 
                         if (c.distance != 0){
                             connections.push_back(c);
@@ -164,8 +156,10 @@ Connection* SCellToConnect (const SMap& map, unsigned int player){
         
 
         //tri de connections par distance
-        std::sort(connections.begin(), connections.end(), comparator_connection);
-
+        std::sort(connections.begin(), connections.end(), [](Connection c1, Connection c2){
+            return c1.distance < c2.distance;
+        });
+        
         //vérification s'il y a plusieurs distance min
         int i = 0;
         int nbDices = 0;
@@ -176,7 +170,7 @@ Connection* SCellToConnect (const SMap& map, unsigned int player){
             i+=1;
         }
         if (i < connections.size()){
-            return &connections[i];
+            return &connections[i-1];
         }
     }
     return NULL;
