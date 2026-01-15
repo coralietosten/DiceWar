@@ -12,6 +12,12 @@ add_library(${LIB_NAME} MODULE
  "src/StrategyTest.cpp"
  "src/StrategyTest.h"
  "src/interface_lib.h"
+ "src/AStar.h"
+ "src/AStar.cpp"
+ "src/Proba.h"
+ "src/Proba.cpp"
+ "src/utilites.cpp"
+ "src/utilites.h"
 )
 
 setup_opt(${LIB_NAME})
