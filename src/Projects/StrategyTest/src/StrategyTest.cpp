@@ -1,82 +1,141 @@
 #include "StrategyTest.h"
 #include <iostream>
-
-StrategyTest::StrategyTest(unsigned int id, unsigned int nbPlayer, const SMap* map) :
-	Id(id),
-	NbPlayer(nbPlayer)
+#include "AStar.h"
+#include "utilites.h"
+    
+StrategyTest::StrategyTest(unsigned int id, unsigned int nbPlayer, const SMap* map) 
+    : Id(id), NbPlayer(nbPlayer)
 {
-	// faire une copie enti�re de la structure map localement dans l'objet Map
-	Map.nbCells = map->nbCells;
-	Map.cells = new SCell[map->nbCells];
-	for(int i=0;i<Map.nbCells;i++){
-		Map.cells[i] = map->cells[i];
-	}
+    Map.nbCells = map->nbCells;
+    Map.cells = new SCell[Map.nbCells];
+
+    for (unsigned int i = 0; i < Map.nbCells; i++) {
+        Map.cells[i].infos = map->cells[i].infos;
+        Map.cells[i].nbNeighbors = map->cells[i].nbNeighbors;
+
+        if (Map.cells[i].nbNeighbors > 0) {
+            Map.cells[i].neighbors = new pSCell[Map.cells[i].nbNeighbors];
+        } else {
+            Map.cells[i].neighbors = nullptr;
+        }
+    }
+
+    for (unsigned int i = 0; i < Map.nbCells; i++) {
+        for (unsigned int j = 0; j < Map.cells[i].nbNeighbors; j++) {
+            SCell* originalNeighbor = map->cells[i].neighbors[j];
+            unsigned int index = 0;
+            bool found = false;
+            for (; index < map->nbCells; index++) {
+                if (&map->cells[index] == originalNeighbor) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                Map.cells[i].neighbors[j] = nullptr;
+            } else {
+                Map.cells[i].neighbors[j] = &Map.cells[index];
+            }
+        }
+    }
 }
 
-StrategyTest::~StrategyTest()
+StrategyTest::~StrategyTest() 
 {
-	delete[] Map.cells ;
-	Map.nbCells = 0 ;
+    // Libérer chaque tableau de voisins
+    for (unsigned int i = 0; i < Map.nbCells; i++) {
+        delete[] Map.cells[i].neighbors;
+    }
+    // Libérer le tableau de cellules
+    delete[] Map.cells;
+    Map.cells = nullptr;
+    Map.nbCells = 0;
 }
+
+
+void StrategyTest::update(const SGameState* state) {
+    for (int i = 0; i < state->nbCells; i++) {
+        const SCellInfo& cell = state->cells[i];
+
+        for (int j = 0; j < Map.nbCells; j++) {
+            SCell& cellMap = Map.cells[j];
+
+            if (cell.id == cellMap.infos.id) {			
+				cellMap.infos.owner = cell.owner;
+                cellMap.infos.nbDices = cell.nbDices;
+                break;
+            }
+        }
+    }
+}
+
 
 bool StrategyTest::PlayTurn(unsigned int gameTurn, const SGameState* state, STurn* turn)
 {
-	// d�rouler votre algorithme de choix
-	std::cout<<"NB JOUEURS : "<<NbPlayer<<std::endl;
-	std::cout<<"Id : "<<Id<<std::endl;
+	// std::cout<<"Debut Update"<<std::endl;
 
-	std::cout<<"Dés : ";
-	for(int i=0;i<NbPlayer;i++){
-		std::cout<<state->diceStock[i];
-		if (i<NbPlayer-1){
-			std::cout<<",";
-		}
-	}
+	update(state);
+	// std::cout<<"Fin Update"<<std::endl;
+	std::cout<<"Gameturn :"<< gameTurn <<std::endl;
+
+
 	std::cout<<std::endl;
+	// std::cout<<"Nb cellules : "<<state->nbCells<<std::endl;
 
-	std::cout<<"Points : ";
-	for(int i=0;i<NbPlayer;i++){
-		std::cout<<state->points[i];
-		if (i<NbPlayer-1){
-			std::cout<<",";
-			
+    ResultatChemin res = AStar(Map,Map.cells[0],Map.cells[5]);
+    // std::cout << res.chemin <<std::endl;
+
+    // std::cout <<"FProba : " << res.probabilite <<std::endl;
+
+    // std::vector<std::vector<SCell>> ls = allCluster(Map,Id);
+    // std::cout << "Nb clusters : " << ls.size() << std::endl;
+    std::vector<SCell> ls = clusterLess(Map,Id);
+
+    
+	for (int i = 0; i < Map.nbCells; i++) {
+		if (Map.cells[i].infos.owner != Id)
+			continue;
+
+		int myDices = Map.cells[i].infos.nbDices;
+
+		int minEnemyDices = -1;
+		int targetIndex = -1;
+		// std::cout << "Cell " << i
+        //   << " neighbors ptr = " << Map.cells[i].neighbors
+        //   << " nbNeighbors = " << Map.cells[i].nbNeighbors
+        //   << std::endl;
+
+		for (int j = 0; j < Map.cells[i].nbNeighbors; j++) {
+			pSCell neighbor = Map.cells[i].neighbors[j];
+
+			if (!neighbor){
+ 				continue;
+			}
+
+			if (neighbor->infos.owner == Id){
+				continue;
+
+			}
+
+			int enemyDices = neighbor->infos.nbDices;
+
+			if (minEnemyDices == -1 || enemyDices < minEnemyDices) {
+				minEnemyDices = enemyDices;
+				targetIndex = j;
+			}
+		}
+
+		if (targetIndex == -1)
+        {
+            continue;
+        }
+
+		if (myDices > minEnemyDices) {
+			turn->cellFrom = Map.cells[i].infos.id;
+			turn->cellTo   = Map.cells[i].neighbors[targetIndex]->infos.id;
+			return true;
 		}
 	}
-	std::cout<<std::endl;
-	std::cout<<"Turn : "<<gameTurn<<std::endl;
 
-
-
-	for(int i = 0; i<Map.nbCells;i++){
-		if(Map.cells[i].infos.owner == Id){
-			int nb = Map.cells[i].infos.nbDices;
-			
-
-			int min = -1;
-			int neig = -1;
-			for(int j=0;j<Map.cells[i].nbNeighbors;j++){
-				if (Map.cells[i].neighbors[j]->infos.owner != Map.cells[i].infos.owner ){
-					int nbDices = Map.cells[i].neighbors[j]->infos.nbDices;
-					if (min == -1){
-						min = nbDices;
-						neig = j;
-					}else if(min>nbDices){
-						min = nbDices;
-						neig = j;
-					}
-				}
-			}
-			std::cout<<"Min : "<<min<<" mine: "<< nb<<std::endl;
-
-			if (min<nb){
-				turn->cellFrom = Map.cells[i].infos.id;
-				turn->cellTo = Map.cells[i].neighbors[neig]->infos.id;
-				std::cout<<"ATTACK : "<<turn->cellFrom<<" TO "<< turn->cellTo<<std::endl;
-
-				return true;
-			}
-			
-		}
-	}
 	return(false);
 }
