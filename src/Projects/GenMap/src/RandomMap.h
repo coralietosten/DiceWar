@@ -1,6 +1,11 @@
 #pragma once
 
 #include <iostream>
+#include <algorithm>
+#include <vector>
+#include <array>
+#include <utility>
+#include <cstdlib>
 #include <ctime>
 #include <cmath> 
 #include <vector>
