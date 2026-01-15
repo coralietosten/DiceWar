@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.8)
 
 # Function to enable Hot Reload for MSVC compilers if supported.
 function(enable_hot_reload)

@@ -3,6 +3,7 @@
 #include "../../../Commun/IStrategyLib.h"
 #include "utilites.h"
 
+
 class StrategyTest
 {
 public:
@@ -16,9 +17,12 @@ public:
 
 public:
 	bool PlayTurn(unsigned int gameTurn, const SGameState *state, STurn *turn);
+	void update(const SGameState* state);
 
 protected:
 	const unsigned int Id;
 	const unsigned int NbPlayer;
 	SMap Map;
 };
+
+

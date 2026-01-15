@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.14)
+﻿cmake_minimum_required (VERSION 3.8)
 
 set(LIB_NAME "strategytest")
 
@@ -16,8 +16,8 @@ add_library(${LIB_NAME} MODULE
  "src/AStar.cpp"
  "src/Proba.h"
  "src/Proba.cpp"
- "src/utilites.cpp"
- "src/utilites.h"
+ "src/Utilities.cpp"
+ "src/Utilities.h"
 )
 
 setup_opt(${LIB_NAME})

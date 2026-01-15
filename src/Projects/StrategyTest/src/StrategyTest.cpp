@@ -1,3 +1,5 @@
+// #pragma once
+
 #include "StrategyTest.h"
 #include <iostream>
 #include "AStar.h"
@@ -6,6 +8,38 @@
 StrategyTest::StrategyTest(unsigned int id, unsigned int nbPlayer, const SMap* map) 
     : Id(id), NbPlayer(nbPlayer)
 {
+    Map.nbCells = map->nbCells;
+    Map.cells = new SCell[Map.nbCells];
+
+    for (unsigned int i = 0; i < Map.nbCells; i++) {
+        Map.cells[i].infos = map->cells[i].infos;
+        Map.cells[i].nbNeighbors = map->cells[i].nbNeighbors;
+
+        if (Map.cells[i].nbNeighbors > 0) {
+            Map.cells[i].neighbors = new pSCell[Map.cells[i].nbNeighbors];
+        } else {
+            Map.cells[i].neighbors = nullptr;
+        }
+    }
+
+    for (unsigned int i = 0; i < Map.nbCells; i++) {
+        for (unsigned int j = 0; j < Map.cells[i].nbNeighbors; j++) {
+            SCell* originalNeighbor = map->cells[i].neighbors[j];
+            unsigned int index = 0;
+            bool found = false;
+            for (; index < map->nbCells; index++) {
+                if (&map->cells[index] == originalNeighbor) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                Map.cells[i].neighbors[j] = nullptr;
+            } else {
+                Map.cells[i].neighbors[j] = &Map.cells[index];
+            }
+        }
+    }
     Map.nbCells = map->nbCells;
     Map.cells = new SCell[Map.nbCells];
 
