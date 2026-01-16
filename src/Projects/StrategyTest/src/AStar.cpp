@@ -1,8 +1,4 @@
-#include "Proba.h"
 #include "AStar.h"
-#include <vector>
-#include <iostream>
-#include <algorithm> // Pour std::find
 
 
 

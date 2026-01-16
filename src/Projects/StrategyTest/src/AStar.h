@@ -1,6 +1,10 @@
 #pragma once
 #include <vector>
 #include "../../../Commun/IStrategyLib.h"
+#include "Proba.h"
+#include <vector>
+#include <iostream>
+#include <algorithm> // Pour std::find
 
 // Définition de la structure pour le résultat du chemin -> si résultat trop bas on peut ne pas les faire se rejoindre
 struct ResultatChemin {
