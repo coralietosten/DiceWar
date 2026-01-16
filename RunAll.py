@@ -1,22 +1,23 @@
 import subprocess
 import re
-import re
+import random
 
 
+lsStrat = ["./bin/Linux/Release/strategytest.so","./bin/Linux/Debug/strategy.so","./bin/Linux/Debug/strategy.so","./bin/Linux/Debug/strategy.so"]
 
-for i in range(1000):
-    if i%2==0:
-        subprocess.run(
-            ["./bin/Linux/Debug/dicewars", "-r","./bin/Linux/Debug/referee.so","-m","./bin/Linux/Release/genmap.so","-s","./bin/Linux/Release/strategytest.so","-s","./bin/Linux/Debug/strategy.so","-g","./bin/Linux/Debug/guistats.so"],
-            check=False,
-            stdout=subprocess.DEVNULL,  # ne pas afficher la sortie normale
-        )
-    else:
-        subprocess.run(
-            ["./bin/Linux/Debug/dicewars", "-r","./bin/Linux/Debug/referee.so","-m","./bin/Linux/Release/genmap.so","-s","./bin/Linux/Debug/strategy.so","-s","./bin/Linux/Release/strategytest.so","-g","./bin/Linux/Debug/guistats.so"],
-            check=False,
-            stdout=subprocess.DEVNULL,  # ne pas afficher la sortie normale
-        )
+for i in range(5000):
+    command = ["./bin/Linux/Debug/dicewars", "-r","./bin/Linux/Debug/referee.so","-m","./bin/Linux/Release/genmap.so"]
+    random.shuffle(lsStrat)
+    for e in lsStrat:
+        command.append("-s")
+        command.append(e)
+    command.extend(["-g","./bin/Linux/Debug/guistats.so"])
+    subprocess.run(
+        command,
+        check=False,
+        stdout=subprocess.DEVNULL,  # ne pas afficher la sortie normale
+    )
+        
 
 nom_fichier = "resstats.txt"
 
