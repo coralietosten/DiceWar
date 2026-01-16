@@ -38,13 +38,13 @@ bool ReunirTerritoire(ResultatChemin& resultat, const SMap& map, STurn& turn)
     }
 
 
-    if(probability_un == 0.0 && probability_deux == 0.0)  // todo : modifier pour ne pas attaquer si chance inférieur à x% ?
+    if(probability_un <=35 && probability_deux <= 35)  // todo : modifier pour ne pas attaquer si chance inférieur à x% ?
     {
         // Aucune chance de réussir depuis les deux côtés
         return false; 
     }
 
-    if (probability_un == 0.0)
+    if (probability_un <= 30)
     {
         // on fait Astar depuis la fin
         resultat = AStar(map, last_owned, first_owned);
@@ -79,6 +79,9 @@ bool AttackOrNot(const SMap& map, std::vector<std::vector<SCell>>& lsClusters)
 
     if (lsClusters.empty() || lsClusters[0].empty()) return false;
     unsigned int mon_id = lsClusters[0][0].infos.owner;
+    bool attaque = true;
+
+
 
     // LOGIQUE 1 : EST ON TROP FAIBLE POUR ATTAQUER ?
 
@@ -106,9 +109,10 @@ bool AttackOrNot(const SMap& map, std::vector<std::vector<SCell>>& lsClusters)
         // Si la moyenne mondiale (+30%) est supérieure à la nôtre
         // OU si on est vraiment critique (< 3.0) -> ON N'ATTAQUE PAS
         if ((moyenne_globale * 1.3) > notre_moyenne || notre_moyenne < 3.0) {
-            return false; 
+            attaque = false; 
         }
     }
+    
 
 
     // LOGIQUE 2 : IL FAUT Q'ON ARRETE D4ATTENDRE
@@ -169,15 +173,24 @@ bool AttackOrNot(const SMap& map, std::vector<std::vector<SCell>>& lsClusters)
     {
         return true; // on est pas assez dominant, on attaque
     }
+    bool condition_monde = (nb_joueurs_actifs < 3);   // si y'a que 2 joueurs = on est en duel il faut attaquer
+    if (condition_monde) 
+    {
+        return true; // en duel, on attaque tout le temps
+    }
 
+
+    if(attaque == false)
+    {
+        return false; // on est trop faible, on n'attaque pas
+    }
 
     double coefficient_domination = 1.3; // il faudra surment l'ajuster
     
     bool condition_domination = (nombre_nos_territoires > (max_territoires_ennemi * coefficient_domination));
     bool condition_force = (notre_moyenne >= 7.0);  // on remet au cas où
-    bool condition_monde = (nb_joueurs_actifs < 3);   // si y'a que 2 joueurs = on est en duel il faut attaquer
 
-    if (condition_domination && condition_force && condition_monde) 
+    if (condition_domination && condition_force) 
     {
         return true; // Tous les feux sont au vert, on écrase tout !
     }
