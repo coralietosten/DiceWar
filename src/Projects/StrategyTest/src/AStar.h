@@ -12,6 +12,6 @@ struct ResultatChemin {
     double probabilite;
 };
 
-void _AStar(SCell* current, const SCell* goal, std::vector<SCell>& path, double current_prob, int current_dice, std::vector<int>& visited_ids,double g_max_prob,std::vector<SCell> g_best_path );
+void _AStar(SCell* current, const SCell* goal, std::vector<SCell>& path, double current_prob, int current_dice, std::vector<int>& visited_ids,double& g_max_prob,std::vector<SCell>& g_best_path );
 
 ResultatChemin AStar(const SMap map, const SCell& start, const SCell& goal);

@@ -5,7 +5,7 @@
 
 
 
-void _AStar(SCell* current, const SCell* goal, std::vector<SCell>& path, double current_prob, int current_dice, std::vector<int>& visited_ids,double g_max_prob,std::vector<SCell> g_best_path ) {
+void _AStar(SCell* current, const SCell* goal, std::vector<SCell>& path, double current_prob, int current_dice, std::vector<int>& visited_ids,double& g_max_prob,std::vector<SCell>& g_best_path ) {
     // Cas de Terminaisons de la récursion :
 
     // STOP : On ne peut pas attaquer avec 1 seul dé 
@@ -119,7 +119,12 @@ ResultatChemin AStar(const SMap map, const SCell& start, const SCell& goal) {
     // Dés de départ = start.infos.nbDices
     _AStar(pStart, &goal, current_path, 1.0, start.infos.nbDices, visited_ids,g_max_prob,g_best_path);
 
+
+    ResultatChemin resultat;
+    resultat.chemin = g_best_path;
+    resultat.probabilite = g_max_prob;
+
     // 4. On retourne le meilleur chemin trouvé
     // MODIFICATION ICI : On retourne les deux variables globales dans la structure
-    return {g_best_path, g_max_prob};
+    return resultat;
 }
