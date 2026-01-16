@@ -9,3 +9,4 @@
 /.vs
 /.vscode
 /temp
+CMakePresets.json
