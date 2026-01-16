@@ -3,10 +3,10 @@ import re
 import random
 
 
-lsStrat = ["./bin/Linux/Release/strategytest.so","./bin/Linux/Debug/strategy.so","./bin/Linux/Debug/strategy.so","./bin/Linux/Debug/strategy.so"]
+lsStrat = ["./bin/Linux/Debug/strategytest.so","./bin/Linux/Debug/strategy.so","./bin/Linux/Debug/strategy.so","./bin/Linux/Debug/strategy.so"]
 
 for i in range(5000):
-    command = ["./bin/Linux/Debug/dicewars", "-r","./bin/Linux/Debug/referee.so","-m","./bin/Linux/Release/genmap.so"]
+    command = ["./bin/Linux/Debug/dicewars", "-r","./bin/Linux/Debug/referee.so","-m","./bin/Linux/Debug/genmap.so"]
     random.shuffle(lsStrat)
     for e in lsStrat:
         command.append("-s")
